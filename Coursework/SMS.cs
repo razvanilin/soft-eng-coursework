@@ -45,9 +45,9 @@ namespace Coursework
             return this.type;
         }
 
-        public void print()
+        public string print()
         {
-            
+            return "SMS: " + sender + " --- " + messageTxt;
         }
 
         public void setMessageTxt(string txt)

@@ -46,9 +46,9 @@ namespace Coursework
             return this.type;
         }
 
-        public override void print()
+        public override string print()
         {
-
+            return "SIREmail: " + sender + " --- " + subject + " --- " + incident.getSortCode() + " --- " + incident.getNature();
         }
 
         public override void setMessageTxt(string txt)

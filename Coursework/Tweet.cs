@@ -45,8 +45,9 @@ namespace Coursework
             return this.type;
         }
 
-        public void print()
+        public string print()
         {
+            return "Tweet: " + sender + " " + messageTxt;
         }
 
         public void setMessageTxt(string txt)

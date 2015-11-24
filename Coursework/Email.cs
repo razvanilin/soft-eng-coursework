@@ -11,7 +11,7 @@ namespace Coursework
         public abstract string getMessageTxt();
         public abstract string getSender();
         public abstract string getType();
-        public abstract void print();
+        public abstract string print();
         public abstract void setMessageTxt(string txt);
         public abstract void setSender(string txt);
         public abstract void processUrls();

@@ -44,9 +44,9 @@ namespace Coursework
             return this.type;
         }
 
-        public override void print()
+        public override string print()
         {
-            
+            return "Email: " + sender + " --- " + subject;
         }
 
         public override void processUrls()

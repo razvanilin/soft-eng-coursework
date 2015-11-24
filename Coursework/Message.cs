@@ -14,7 +14,7 @@ namespace Coursework
 
         String getType();
 
-        void print();
+        string print();
 
         void setMessageTxt(String txt);
 

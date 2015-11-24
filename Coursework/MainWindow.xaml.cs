@@ -40,6 +40,7 @@ namespace Coursework
 
             InitializeComponent();
             smsRadio.IsChecked = true;
+            addMessageTab.IsSelected = true;
 
         }
 
@@ -119,14 +120,54 @@ namespace Coursework
             Message sms = new SMS(messageBody, number);
             MessageBox.Show(sms.getMessageTxt());
             messageFactory.addMessage(sms);
+
+            updateMessagesList();
         }
 
         private void processEmail()
         {
+            string sender = "";
+            string subject = "";
+            string sortCode = "";
+            string incidentNature = "";
+            string messageBody = "";
+            bool isSir = false;
+            // split the string into elements - 0 - sender - 1 - subject - 2 - message body
+            string[] elements = messageTxt.Text.Split('\n');
+            // clear the empty space at the end of each element
+            elements[0] = elements[0].Substring(0, elements[0].Length - 1);
+            elements[1] = elements[1].Substring(0, elements[1].Length - 1);
+
+            if (elements.Length < 3 || elements.Length > 5)
+            {
+                MessageBox.Show("Please enter: email, subject and message body. All separated by a new line.\n Include 'Sort Code:' and 'Incident Nature:' after the subject to record an incident.");
+                return;
+            }
+
+            // check for standard email
+            if (elements.Length == 3)
+            {
+                sender = elements[0];
+                subject = elements[1];
+                messageBody = elements[2];
+            } 
+            // else, it's an incident report
+            else
+            {
+                sender = elements[0];
+                subject = elements[1];
+                sortCode = elements[2];
+                incidentNature = elements[3];
+                messageBody = elements[4];
+                isSir = true;
+            }
+
             // email regex
-            string regex = @"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b";
+            string regex = @"^[\w!#$%&'*+\-/=?\^_`{|}~]+(\.[\w!#$%&'*+\-/=?\^_`{|}~]+)*"
+                           + "@"
+                           + @"((([\-\w]+\.)+[a-zA-Z]{2,4})|(([0-9]{1,3}\.){3}[0-9]{1,3}))$";
             Regex r = new Regex(regex);
-            Match match = r.Match(senderTxt.Text);
+            Match match = r.Match(sender);
             // validate the sender
             if (!match.Success)
             {
@@ -135,27 +176,78 @@ namespace Coursework
             }
 
             // validate the subject
-            if (String.IsNullOrEmpty(subjectTxt.Text))
+            if (String.IsNullOrEmpty(subject))
             {
                 MessageBox.Show("Please enter a subject.");
                 return;
             }
-            if (subjectTxt.Text.Length > 20)
+            if (subject.Length > 20)
             {
                 MessageBox.Show("The subject must be less than 20 characters.");
                 return;
             }
 
             // validate the message body
-            if (String.IsNullOrEmpty(messageTxt.Text))
+            if (String.IsNullOrEmpty(messageBody))
             {
                 MessageBox.Show("Please enter a message.");
                 return;
             }
-            if (messageTxt.Text.Length > 1028)
+            if (messageBody.Length > 1028)
             {
                 MessageBox.Show("The email message body must be less than 1028 characters.");
             }
+
+            // validate incident fields
+            if (isSir && sortCode.ToLower().StartsWith("sort code:")) 
+            {
+                // get the number from the sort code line
+                sortCode = sortCode.Replace(" ", "");
+                sortCode = sortCode.Substring(sortCode.IndexOf(':')+1);
+            }
+            else if (isSir)
+            {
+                MessageBox.Show("The sort code is not valid. Try something like 'Sort Code: 99-99-99'");
+                return;
+            }
+
+            // validate incident
+            if (isSir && incidentNature.ToLower().StartsWith("incident nature:"))
+            {
+                int offset = 1;
+                if (incidentNature.Substring(incidentNature.IndexOf(':') + 1, 1) == " ") offset = 2;
+                incidentNature = incidentNature.Substring(incidentNature.IndexOf(':') + offset);
+            }
+            else if (isSir)
+            {
+                MessageBox.Show("Incident nature is not valid. Try something like 'Incident Nature: Theft'");
+                return;
+            }
+
+            // validate the subject format
+            string sirRegexString = @"SIR [0-9][0-9]/[0-9][0-9]/[0-9][0-9]";
+            Regex sirRegex = new Regex(sirRegexString);
+            Match matchRegex = sirRegex.Match(elements[1]);
+
+            Email email;
+            if (!matchRegex.Success && !isSir)
+            {
+                email = new StandardEmail(messageBody, sender, subject);
+                MessageBox.Show("The standard email message was created.");
+            }
+            else if (isSir && matchRegex.Success)
+            {
+                email = new SIREmail(messageBody, sender, subject, sortCode, incidentNature);
+                MessageBox.Show("The SIR email message was created.");
+            }
+            else
+            {
+                MessageBox.Show("Incident subject not valid. Try something like: 'SIR dd/mm/yy'");
+                return;
+            }
+
+            messageFactory.addMessage(email);
+            updateMessagesList();
         }
 
         private void processTweet()
@@ -173,11 +265,36 @@ namespace Coursework
             }
         }
 
+        private void updateMessagesList()
+        {
+            foreach (Message msg in messageFactory.getAllMessages())
+            {
+                messagesBox.Items.Add(msg.print());
+            }
+        }
+
         private void messageTxt_KeyUp(object sender, KeyEventArgs e)
         {
             charCountTxt.Text = "";
             int charCounter = messageTxt.Text.Length;
             charCountTxt.Text = "Characters: " + charCounter;
+        }
+
+        private void menuTab_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            switch(menuTab.SelectedIndex)
+            {
+                case 0:
+                    addMessageGrid.Visibility = Visibility.Visible;
+                    messagesGrid.Visibility = Visibility.Hidden;
+                    break;
+                case 1:
+                    addMessageGrid.Visibility = Visibility.Hidden;
+                    messagesGrid.Visibility = Visibility.Visible;
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }
