@@ -20,6 +20,15 @@ namespace Coursework
             type = "standard_email";
         }
 
+        public StandardEmail(string messageTxt, string sender, string subject)
+        {
+            urlQuarantine = URLQuarantine.Instance;
+            type = "standard_email";
+            this.messageTxt = messageTxt;
+            this.sender = sender;
+            this.subject = subject;
+        }
+
         public override string getMessageTxt()
         {
             return this.messageTxt;
@@ -38,6 +47,11 @@ namespace Coursework
         public override void print()
         {
             
+        }
+
+        public override void processUrls()
+        {
+            throw new NotImplementedException();
         }
 
         public override void setMessageTxt(string txt)

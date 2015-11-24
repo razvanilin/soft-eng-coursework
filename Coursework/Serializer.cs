@@ -14,20 +14,50 @@ namespace Coursework
         {
             return null;
         }
+        public void serializeMentions(List<string> mentions)
+        {
+
+        }
 
         public List<string> deserializeHashtags()
         {
             return null;
+        }
+        public void serializeHashtags(List<string> hashtags)
+        {
+
         }
 
         public List<string> deserializeUrls()
         {
             return null;
         }
+        public void serializeUrls(List<string> urls)
+        {
+
+        }
 
         public List<string> deserializeAbbreviations()
         {
             return null;
+        }
+
+        public List<Incident> deserializeIncidents()
+        {
+            return null;
+        }
+        public void serializeIncident(List<Incident> incidents)
+        {
+
+        }
+
+        public List<Message> deserializeMessages()
+        {
+            return null;
+        }
+        public void serializeMessages(List<Message> messageList)
+        {
+
         }
     }
 }

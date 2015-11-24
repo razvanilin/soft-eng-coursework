@@ -8,39 +8,54 @@ namespace Coursework
 {
     class SMS : Message
     {
-        private String messageTxt;
-        private String sender;
-        private String type;
+        private string messageTxt;
+        private string sender;
+        private string type;
         TxtAbbreviation txtAbbreviation;
+
+        public SMS()
+        {
+            txtAbbreviation = TxtAbbreviation.Instance;
+            this.type = "sms";
+        }
+
+        public SMS(string messageTxt, string sender, string type)
+        {
+            this.messageTxt = messageTxt;
+            this.sender = sender;
+            this.type = type;
+            txtAbbreviation = TxtAbbreviation.Instance;
+            this.type = "sms";
+        }
 
         public string getMessageTxt()
         {
-            throw new NotImplementedException();
+            return this.messageTxt;
         }
 
         public string getSender()
         {
-            throw new NotImplementedException();
+            return this.sender;
         }
 
         public string getType()
         {
-            throw new NotImplementedException();
+            return this.type;
         }
 
         public void print()
         {
-            throw new NotImplementedException();
+            
         }
 
         public void setMessageTxt(string txt)
         {
-            throw new NotImplementedException();
+            this.messageTxt = txt;
         }
 
         public void setSender(string txt)
         {
-            throw new NotImplementedException();
+            this.sender = txt;
         }
 
         public bool processAbbreviations()

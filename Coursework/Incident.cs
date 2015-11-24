@@ -8,17 +8,22 @@ namespace Coursework
 {
     class Incident
     {
-        private String incidentNature;
-        private String sortCode;
+        private string incidentNature;
+        private string sortCode;
 
         public Incident() { }
+        public Incident(string incidentNature, string sortCode)
+        {
+            this.incidentNature = incidentNature;
+            this.sortCode = sortCode;
+        } 
 
-        public String getNature() { return incidentNature; }
+        public string getNature() { return incidentNature; }
 
-        public String getSortCode() { return sortCode; }
+        public string getSortCode() { return sortCode; }
 
-        public void setNature(String incidentNature) { this.incidentNature = incidentNature; }
+        public void setNature(string incidentNature) { this.incidentNature = incidentNature; }
 
-        public void setSortCode(String sortCode) { this.sortCode = sortCode; }
+        public void setSortCode(string sortCode) { this.sortCode = sortCode; }
     }
 }

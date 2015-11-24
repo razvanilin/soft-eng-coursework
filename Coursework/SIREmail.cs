@@ -21,6 +21,16 @@ namespace Coursework
             type = "sir_email";
         }
 
+        public SIREmail(string messageTxt, string sender, string subject, string sortCode, string incidentNature)
+        {
+            urlQuarantine = URLQuarantine.Instance;
+            type = "sir_email";
+            this.messageTxt = messageTxt;
+            this.sender = sender;
+            this.subject = subject;
+            this.incident = new Incident(incidentNature, sortCode);
+        }
+
         public override string getMessageTxt()
         {
             return this.messageTxt;
@@ -52,5 +62,10 @@ namespace Coursework
         }
 
         public Incident getIncident() { return incident; }
+
+        public override void processUrls()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

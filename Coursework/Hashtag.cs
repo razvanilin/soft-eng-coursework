@@ -13,7 +13,8 @@ namespace Coursework
         private Serializer serializer;
 
         private  Hashtag() {
-            hashtags = new List<string>();
+            serializer = new Serializer();
+            hashtags = deserialize();
         }
 
         public static Hashtag Instance
@@ -26,6 +27,16 @@ namespace Coursework
                 }
                 return instance;
             }
+        }
+
+        public void serialize()
+        {
+            serializer.serializeHashtags(this.hashtags);
+        }
+
+        private List<string> deserialize()
+        {
+            return serializer.deserializeHashtags();
         }
     }
 }

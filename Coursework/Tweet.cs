@@ -21,6 +21,15 @@ namespace Coursework
             type = "tweet";
         }
 
+        public Tweet(string messageTxt, string sender)
+        {
+            hashtag = Hashtag.Instance;
+            mention = Mention.Instance;
+            type = "tweet";
+            this.messageTxt = messageTxt;
+            this.sender = sender;
+        }
+
         public string getMessageTxt()
         {
             return this.messageTxt;

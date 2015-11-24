@@ -14,7 +14,7 @@ namespace Coursework
 
         private URLQuarantine() {
             serializer = new Serializer();
-            urlList = new List<string>();
+            urlList = this.deserialize();
         }
 
         public static URLQuarantine Instance
@@ -36,6 +36,11 @@ namespace Coursework
         public List<string> deserialize()
         {
             return serializer.deserializeUrls();
+        }
+
+        public void serialize()
+        {
+            serializer.serializeUrls(urlList);
         }
     }
 }

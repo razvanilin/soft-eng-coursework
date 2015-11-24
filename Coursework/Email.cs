@@ -14,6 +14,7 @@ namespace Coursework
         public abstract void print();
         public abstract void setMessageTxt(string txt);
         public abstract void setSender(string txt);
+        public abstract void processUrls();
 
         void addUrlToQuarantine() { }
 

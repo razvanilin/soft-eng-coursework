@@ -14,7 +14,8 @@ namespace Coursework
 
         private Mention()
         {
-            mentions = new List<string>();   
+            serializer = new Serializer();
+            mentions = deserialize();   
         }
 
         public static Mention Instance
@@ -29,8 +30,11 @@ namespace Coursework
             }
         }
 
-        private List<string> deserialize() { return null; }
+        private List<string> deserialize() { return serializer.deserializeMentions(); }
 
-        public void serialize() { }
+        public void serialize()
+        {
+            serializer.serializeMentions(mentions);
+        }
     }
 }
