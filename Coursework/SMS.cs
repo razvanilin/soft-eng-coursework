@@ -19,13 +19,15 @@ namespace Coursework
             this.type = "sms";
         }
 
-        public SMS(string messageTxt, string sender, string type)
+        public SMS(string messageTxt, string sender)
         {
             this.messageTxt = messageTxt;
             this.sender = sender;
-            this.type = type;
             txtAbbreviation = TxtAbbreviation.Instance;
             this.type = "sms";
+
+            // process the message body and check it for any abbreviations
+            this.processAbbreviations();
         }
 
         public string getMessageTxt()
@@ -58,9 +60,9 @@ namespace Coursework
             this.sender = txt;
         }
 
-        public bool processAbbreviations()
+        public void processAbbreviations()
         {
-            return false;
+            messageTxt = txtAbbreviation.porcessAbbreviations(messageTxt);
         }
     }
 }

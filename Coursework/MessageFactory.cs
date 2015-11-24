@@ -18,6 +18,8 @@ namespace Coursework
             incidentManager = IncidentManager.Instance;
             serializer = new Serializer();
             messageList = deserialize();
+
+            if (messageList == null) messageList = new List<Message>();
         }
 
         public static MessageFactory Instance

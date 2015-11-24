@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,9 +38,10 @@ namespace Coursework
 
         }
 
-        public List<string> deserializeAbbreviations()
+        public Dictionary<string, string> deserializeAbbreviations()
         {
-            return null;
+            var dict = File.ReadLines("textwords.csv").Select(line => line.Split(',')).ToDictionary(line => line[0], line => line[1]);
+            return dict;
         }
 
         public List<Incident> deserializeIncidents()
