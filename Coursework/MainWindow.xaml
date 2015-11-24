@@ -18,7 +18,7 @@
                 <Grid Background="#FFE5E5E5"/>
             </TabItem>
         </TabControl>
-        <Grid HorizontalAlignment="Left" Height="419" Margin="10,25,0,0" VerticalAlignment="Top" Width="772">
+        <Grid HorizontalAlignment="Left" Height="534" Margin="10,25,0,0" VerticalAlignment="Top" Width="772">
             <Label x:Name="label" Content="Add new message" HorizontalAlignment="Left" Margin="278,10,0,0" VerticalAlignment="Top" FontSize="26.667"/>
             <RadioButton x:Name="smsRadio" Content="SMS Message" HorizontalAlignment="Left" Margin="187,93,0,0" VerticalAlignment="Top" GroupName="messageType" Checked="smsRadio_Checked"/>
             <RadioButton x:Name="emailRadio" Content="Email" HorizontalAlignment="Left" Margin="366,94,0,0" VerticalAlignment="Top" GroupName="messageType" Checked="emailRadio_Checked"/>
@@ -26,10 +26,11 @@
             <Label x:Name="senderLabel" Content="Sender" HorizontalAlignment="Left" Margin="40,164,0,0" VerticalAlignment="Top"/>
             <TextBox x:Name="senderTxt" HorizontalAlignment="Left" Height="23" Margin="187,167,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="390" ToolTip="Sender"/>
             <Label x:Name="bodyLabel" Content="Message body" HorizontalAlignment="Left" Margin="40,263,0,0" VerticalAlignment="Top"/>
-            <TextBox x:Name="messageTxt" HorizontalAlignment="Left" Height="114" Margin="187,263,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="390" ToolTip="Message body"/>
+            <TextBox x:Name="messageTxt" HorizontalAlignment="Left" Height="114" Margin="187,263,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="390" ToolTip="Message body" KeyUp="messageTxt_KeyUp"/>
             <Label x:Name="subjectLabel" Content="Subject" HorizontalAlignment="Left" Margin="40,213,0,0" VerticalAlignment="Top" Visibility="Hidden"/>
             <TextBox x:Name="subjectTxt" HorizontalAlignment="Left" Height="23" Margin="187,216,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="390" ToolTip="Subject" Visibility="Hidden"/>
+            <Button x:Name="sendBtn" Content="Send Message" HorizontalAlignment="Left" Margin="329,425,0,0" VerticalAlignment="Top" Width="84" Click="sendBtn_Click"/>
+            <TextBlock x:Name="charCountTxt" HorizontalAlignment="Left" Margin="487,382,0,0" TextWrapping="Wrap" Text="Characters: " VerticalAlignment="Top"/>
         </Grid>
-        <TextBox x:Name="testTxt" HorizontalAlignment="Left" Height="23" Margin="99,485,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
     </Grid>
 </Window>
