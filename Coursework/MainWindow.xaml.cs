@@ -21,27 +21,20 @@ namespace Coursework
     /// </summary>
     public partial class MainWindow : Window
     {
-        private string number;
-        private string sender;
-        private string sortCode;
-        private string incidentNature;
-        private string messageBody;
+
         private MessageFactory messageFactory;
+        private IncidentManager incidentManager;
 
         public MainWindow()
         {
-            // initialise the string debugging variables
-            number = "";
-            sender = "";
-            sortCode = "";
-            incidentNature = "";
-            messageBody = "";
+
             messageFactory = MessageFactory.Instance;
+            incidentManager = IncidentManager.Instance;
 
             InitializeComponent();
             smsRadio.IsChecked = true;
             addMessageTab.IsSelected = true;
-
+       
         }
 
         private void smsRadio_Checked(object sender, RoutedEventArgs e)
@@ -87,7 +80,7 @@ namespace Coursework
                 MessageBox.Show("Please enter something in the message body.");
                 return;
             }
-
+            string number;
             try {
                 number = messageTxt.Text.Substring(0, messageTxt.Text.IndexOf(" "));
             } catch(Exception e)
@@ -198,12 +191,21 @@ namespace Coursework
                 MessageBox.Show("The email message body must be less than 1028 characters.");
             }
 
-            // validate incident fields
+            // validate sort code
             if (isSir && sortCode.ToLower().StartsWith("sort code:")) 
             {
                 // get the number from the sort code line
                 sortCode = sortCode.Replace(" ", "");
                 sortCode = sortCode.Substring(sortCode.IndexOf(':')+1);
+
+                string sortRegexString = @"[0-9][0-9]\-[0-9][0-9]\-[0-9][0-9]";
+                Regex sortRegex = new Regex(sortRegexString);
+                Match sortMatch = sortRegex.Match(sortCode);
+                if (!sortMatch.Success)
+                {
+                    MessageBox.Show("The sort code number is not valid. Try something like this: 99-99-99");
+                    return;
+                }
             }
             else if (isSir)
             {
@@ -217,6 +219,26 @@ namespace Coursework
                 int offset = 1;
                 if (incidentNature.Substring(incidentNature.IndexOf(':') + 1, 1) == " ") offset = 2;
                 incidentNature = incidentNature.Substring(incidentNature.IndexOf(':') + offset);
+                incidentNature = incidentNature.Substring(0, incidentNature.Length - 1);
+                // check to see if the nature type is a valid one
+                bool isMatch = false;
+                string messageTypes = "";
+                foreach (string incidentType in incidentManager.getTypes())
+                {
+                    if (incidentType.ToLower() == incidentNature.ToLower())
+                    {
+                        isMatch = true;
+                        break;
+                    }
+                    messageTypes += incidentType + ", ";
+                }
+
+                if (!isMatch)
+                {
+                    MessageBox.Show(incidentNature.Substring(incidentNature.Length-1));
+                    MessageBox.Show("Incident nature is not valid. Use one of these: " + messageTypes);
+                    return;
+                }
             }
             else if (isSir)
             {

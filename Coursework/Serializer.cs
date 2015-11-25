@@ -61,5 +61,17 @@ namespace Coursework
         {
 
         }
+
+        public List<string> deserializeIncidentsType()
+        {
+            var dict = File.ReadLines("incidents.txt").Select(line => line.Split(','));
+            foreach (var incidents in dict)
+            {
+                List<string> incidentList = incidents.ToList<string>();
+                return incidentList;
+            }
+
+            return null;
+        }
     }
 }

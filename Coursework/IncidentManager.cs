@@ -10,12 +10,14 @@ namespace Coursework
     {
         private static IncidentManager instance;
         private List<Incident> incidentList;
+        private List<string> incidentsType;
         private Serializer serializer;
 
         private IncidentManager()
         {
             serializer = new Serializer();
             incidentList = deserialize();
+            incidentsType = serializer.deserializeIncidentsType();
         }
 
         private List<Incident> deserialize()
@@ -43,6 +45,11 @@ namespace Coursework
         public List<Incident> getIncidents()
         {
             return incidentList;
+        }
+
+        public List<string> getTypes()
+        {
+            return incidentsType;
         }
     }
 }
