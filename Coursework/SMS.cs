@@ -3,14 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.Serialization;
+using System.IO;
+using System.Runtime.Serialization.Json;
 
 namespace Coursework
 {
+    [DataContract]
     class SMS : Message
     {
+        [DataMember]
+        private string id;
+        [DataMember]
         private string messageTxt;
+        [DataMember]
         private string sender;
+        [DataMember]
         private string type;
+
         TxtAbbreviation txtAbbreviation;
 
         public SMS()
@@ -19,12 +29,13 @@ namespace Coursework
             this.type = "sms";
         }
 
-        public SMS(string messageTxt, string sender)
+        public SMS(string id, string messageTxt, string sender)
         {
             this.messageTxt = messageTxt;
             this.sender = sender;
             txtAbbreviation = TxtAbbreviation.Instance;
             this.type = "sms";
+            this.id = id;
 
             // process the message body and check it for any abbreviations
             this.processAbbreviations();
@@ -47,7 +58,7 @@ namespace Coursework
 
         public string print()
         {
-            return "SMS: " + sender + " --- " + messageTxt;
+            return this.type + ": " + sender + " --- " + messageTxt;
         }
 
         public void setMessageTxt(string txt)
@@ -62,7 +73,27 @@ namespace Coursework
 
         public void processAbbreviations()
         {
-            messageTxt = txtAbbreviation.porcessAbbreviations(messageTxt);
+            messageTxt = TxtAbbreviation.Instance.porcessAbbreviations(messageTxt);
+        }
+
+        public string getId()
+        {
+            return this.id;
+        }
+
+        public MemoryStream serialize()
+        {
+            MemoryStream ms = new MemoryStream();
+            DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(SMS));
+
+            js.WriteObject(ms, this);
+
+            return ms;
+        }
+
+        public void processAll()
+        {
+            this.processAbbreviations();
         }
     }
 }

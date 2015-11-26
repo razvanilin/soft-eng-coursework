@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Coursework
 {
@@ -57,9 +53,13 @@ namespace Coursework
             }
         }
 
-        public void recordIncident(SIREmail email)
+        public void recordIncident(Email email)
         {
-            incidentManager.recordIncident(email.getIncident());
+            if (email.GetType() == typeof(SIREmail))
+            {
+                SIREmail sirEmail = (SIREmail)email;
+                incidentManager.recordIncident(sirEmail.getIncident());
+            }
         }
 
         public void removeMessage(Message message)
@@ -69,12 +69,98 @@ namespace Coursework
 
         public void serializeAll()
         {
-            serializer.serializeMessages(messageList);
+            serializer.serializeMessages();
         }
 
         private List<Message> deserialize()
         {
             return serializer.deserializeMessages();
+        }
+        
+        public bool hasId(string id)
+        {
+            foreach(Message message in messageList)
+            {
+                if (message.getId() == id)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        
+        public List<SMS> getSmsList()
+        {
+            List<SMS> smsList = null;
+            foreach(Message m in messageList)
+            {
+                if (m.GetType() == typeof(SMS))
+                {
+                    if (smsList == null) smsList = new List<SMS>();
+
+                    smsList.Add((SMS)m);
+                } 
+            }
+
+            return smsList;
+        }
+        
+        public List<StandardEmail> getStandardEmailList()
+        {
+            List<StandardEmail> standardEmailList = null;
+
+            foreach(Message m in messageList)
+            {
+                if (m.GetType() == typeof(StandardEmail))
+                {
+                    if (standardEmailList == null) standardEmailList = new List<StandardEmail>();
+
+                    standardEmailList.Add((StandardEmail)m);
+                }
+            }
+
+            return standardEmailList;
+        }
+        
+        public List<SIREmail> getSirEmailList()
+        {
+            List<SIREmail> sirEmailList = null;
+
+            foreach(Message m in messageList)
+            {
+                if (m.GetType() == typeof(SIREmail))
+                {
+                    if (sirEmailList == null) sirEmailList = new List<SIREmail>();
+                    sirEmailList.Add((SIREmail)m);
+                }
+            }
+
+            return sirEmailList;
         } 
+
+        public List<Tweet> getTweetList()
+        {
+            List<Tweet> tweetList = null;
+
+            foreach(Message m in messageList)
+            {
+                if (m.GetType() == typeof(Tweet))
+                {
+                    if (tweetList == null) tweetList = new List<Tweet>();
+                    tweetList.Add((Tweet)m);
+                }
+            }
+
+            return tweetList;
+        }
+
+        public void processAll()
+        {
+            foreach(Message m in messageList)
+            {
+                m.processAll();
+            }
+        }
     }
 }

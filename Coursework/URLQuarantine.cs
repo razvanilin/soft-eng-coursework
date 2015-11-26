@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -29,7 +30,9 @@ namespace Coursework
             }
         }
 
-        public void addUrl(String url) { }
+        public void addUrl(String url) {
+            urlList.Add(url);
+        }
 
         public List<string> getList() { return urlList; } 
 

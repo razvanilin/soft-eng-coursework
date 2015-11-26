@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -49,13 +50,6 @@ namespace Coursework
                         string abbValue;
                         abbreviations.TryGetValue(abbreviation, out abbValue);
                         words[i] = "<" + abbValue + ">";
-                    }
-                    // also check if the abbreviations are preceded by punctuation signs and symbols
-                    else if (words[i].ToLower().Substring(1) == abbreviation.ToLower())
-                    {
-                        string abbValue;
-                        abbreviations.TryGetValue(abbreviation, out abbValue);
-                        words[i] = words[i].Substring(0, 1) + "<" + abbValue + ">";
                     }
                     else if (words[i].ToLower().Substring(0, words[i].Length - 1) == abbreviation.ToLower())
                     {

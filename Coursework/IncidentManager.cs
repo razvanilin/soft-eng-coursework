@@ -51,5 +51,10 @@ namespace Coursework
         {
             return incidentsType;
         }
+
+        public void serialize()
+        {
+            serializer.serializeIncident(incidentList);
+        }
     }
 }

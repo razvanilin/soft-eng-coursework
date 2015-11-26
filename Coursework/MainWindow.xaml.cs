@@ -32,44 +32,54 @@ namespace Coursework
             incidentManager = IncidentManager.Instance;
 
             InitializeComponent();
-            smsRadio.IsChecked = true;
             addMessageTab.IsSelected = true;
-       
+            messageFactory.processAll();
+            updateMessagesList();
+            MessageBox.Show(messageFactory.getAllMessages().Count.ToString());
+    
         }
-
-        private void smsRadio_Checked(object sender, RoutedEventArgs e)
-        {
-            subjectLabel.Visibility = Visibility.Hidden;
-            subjectTxt.Visibility = Visibility.Hidden;
-        }
-
-        private void emailRadio_Checked(object sender, RoutedEventArgs e)
-        {
-            subjectLabel.Visibility = Visibility.Visible;
-            subjectTxt.Visibility = Visibility.Visible;
-        }
-
-        private void tweetRadio_Checked(object sender, RoutedEventArgs e)
-        {
-            subjectLabel.Visibility = Visibility.Hidden;
-            subjectTxt.Visibility = Visibility.Hidden;
-        }
-
+  
         private void sendBtn_Click(object sender, RoutedEventArgs e)
         {
-            // check to see which radio button is checked and handle the message differently
-            if (smsRadio.IsChecked.Value)
+            // check if the message id field contains something
+            if (String.IsNullOrEmpty(idTxt.Text))
             {
-                processSms();
+                MessageBox.Show("Message ID is empty. Input something like 'E123456789'.");
+                return;
             }
-            else if (emailRadio.IsChecked.Value)
+
+            string idRegexString = @"(S|E|T)([0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9])";
+            Regex idRegex = new Regex(idRegexString);
+
+            if (!idRegex.IsMatch(idTxt.Text))
             {
-                processEmail();
+                MessageBox.Show("The message ID is not valid. Try something like 'E123456789'.");
+                return;
             }
-            else if (tweetRadio.IsChecked.Value)
+
+            // check if the factory already has the id
+            if (messageFactory.hasId(idTxt.Text))
             {
-                processTweet();
+                MessageBox.Show("The message ID that was entered already exists.");
+                return;
             }
+
+            // check to see which type of message must be processed
+            switch(idTxt.Text.Substring(0,1))
+            {
+                case "S":
+                    processSms();
+                    break;
+                case "E":
+                    processEmail();
+                    break;
+                case "T":
+                    processTweet();
+                    break;
+                default:
+                    break;
+            }
+            
         }
 
         private void processSms()
@@ -110,7 +120,7 @@ namespace Coursework
                 return;
             }
 
-            Message sms = new SMS(messageBody, number);
+            Message sms = new SMS(idTxt.Text, messageBody, number);
             MessageBox.Show(sms.getMessageTxt());
             messageFactory.addMessage(sms);
 
@@ -127,6 +137,14 @@ namespace Coursework
             bool isSir = false;
             // split the string into elements - 0 - sender - 1 - subject - 2 - message body
             string[] elements = messageTxt.Text.Split('\n');
+
+            // make sure there are at least 3 elements in the message
+            if (elements.Length < 3)
+            {
+                MessageBox.Show("Some elements are missing from your email message. \nMake sure you have at least a sender, subject and message body.");
+                return;
+            }
+
             // clear the empty space at the end of each element
             elements[0] = elements[0].Substring(0, elements[0].Length - 1);
             elements[1] = elements[1].Substring(0, elements[1].Length - 1);
@@ -145,7 +163,7 @@ namespace Coursework
                 messageBody = elements[2];
             } 
             // else, it's an incident report
-            else
+            else if (elements.Length == 5)
             {
                 sender = elements[0];
                 subject = elements[1];
@@ -153,6 +171,10 @@ namespace Coursework
                 incidentNature = elements[3];
                 messageBody = elements[4];
                 isSir = true;
+            }
+            else
+            {
+                MessageBox.Show("Your message does not have the right amount of elements.\nStandart email has 3 and SIR emails have 5.");
             }
 
             // email regex
@@ -196,7 +218,7 @@ namespace Coursework
             {
                 // get the number from the sort code line
                 sortCode = sortCode.Replace(" ", "");
-                sortCode = sortCode.Substring(sortCode.IndexOf(':')+1);
+                sortCode = sortCode.Substring(sortCode.IndexOf(':')+1, sortCode.Length-2-sortCode.IndexOf(":"));
 
                 string sortRegexString = @"[0-9][0-9]\-[0-9][0-9]\-[0-9][0-9]";
                 Regex sortRegex = new Regex(sortRegexString);
@@ -254,12 +276,12 @@ namespace Coursework
             Email email;
             if (!matchRegex.Success && !isSir)
             {
-                email = new StandardEmail(messageBody, sender, subject);
+                email = new StandardEmail(idTxt.Text, messageBody, sender, subject);
                 MessageBox.Show("The standard email message was created.");
             }
             else if (isSir && matchRegex.Success)
             {
-                email = new SIREmail(messageBody, sender, subject, sortCode, incidentNature);
+                email = new SIREmail(idTxt.Text, messageBody, sender, subject, sortCode, incidentNature);
                 MessageBox.Show("The SIR email message was created.");
             }
             else
@@ -269,29 +291,94 @@ namespace Coursework
             }
 
             messageFactory.addMessage(email);
+            messageFactory.recordIncident(email);
+
+            MessageBox.Show(email.getMessageTxt());
             updateMessagesList();
         }
 
         private void processTweet()
         {
-            string regex = @"\@+[A-Za-z0-9]{1,15}";
+            // get the elements
+            string sender = messageTxt.Text.Substring(0, messageTxt.Text.IndexOf(" "));
+            string messageBody = messageTxt.Text.Substring(sender.Length + 1);
+
+            string regex = @"^@(\w){1,15}$";
             Regex r = new Regex(regex);
-            Match match = r.Match(senderTxt.Text);
+            Match match = r.Match(sender);
             // validate the sender
             if (!match.Success)
             {
                 MessageBox.Show("Please enter a valid Twitter ID (e.g. @awesomename)");
-                senderTxt.TextWrapping = TextWrapping.Wrap;
                 return;
 
             }
+
+            if (String.IsNullOrEmpty(messageBody))
+            {
+                MessageBox.Show("Please enter a message.");
+                return;
+            }
+
+            if (messageBody.Length > 140)
+            {
+                MessageBox.Show("The message body must be less than 140 characters long");
+                return;
+            }
+
+            Message tweet = new Tweet(idTxt.Text, messageBody, sender);
+            MessageBox.Show(tweet.getMessageTxt());
+            messageFactory.addMessage(tweet);
+            updateMessagesList();
+
+            Mention mention = Mention.Instance;
+            string hashtagString = "";
+            foreach(string m in mention.getMentions().Keys)
+            {
+                hashtagString += m + " " + mention.getMentions()[m];
+            }
+
+            MessageBox.Show(hashtagString);
+     
         }
 
         private void updateMessagesList()
         {
+            messagesBox.Items.Clear();
             foreach (Message msg in messageFactory.getAllMessages())
             {
                 messagesBox.Items.Add(msg.print());
+            }
+
+            // update trends
+            trendsBox.Items.Clear();
+            foreach(string hashtag in Hashtag.Instance.getHashtags().Keys)
+            {
+                trendsBox.Items.Add(Hashtag.Instance.getHashtags()[hashtag] + ", " + hashtag);
+            }
+
+            trendsBox.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("", System.ComponentModel.ListSortDirection.Descending));
+
+            // update mentions
+            mentionsBox.Items.Clear();
+            foreach(string mention in Mention.Instance.getMentions().Keys)
+            {
+                mentionsBox.Items.Add(Mention.Instance.getMentions()[mention] + ", " + mention);
+            }
+            mentionsBox.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("", System.ComponentModel.ListSortDirection.Descending));
+
+            // update incidents
+            incidentsBox.Items.Clear();
+            foreach(Incident incident in IncidentManager.Instance.getIncidents())
+            {
+                incidentsBox.Items.Add(incident.getSortCode() + " - " + incident.getNature());
+            }
+
+            // update urls
+            urlBox.Items.Clear();
+            foreach(string url in URLQuarantine.Instance.getList())
+            {
+                urlBox.Items.Add(url);
             }
         }
 
@@ -309,14 +396,73 @@ namespace Coursework
                 case 0:
                     addMessageGrid.Visibility = Visibility.Visible;
                     messagesGrid.Visibility = Visibility.Hidden;
+                    trendsGrid.Visibility = Visibility.Hidden;
+                    mentionsGrid.Visibility = Visibility.Hidden;
+                    incidentsGrid.Visibility = Visibility.Hidden;
+                    urlGrid.Visibility = Visibility.Hidden;
                     break;
                 case 1:
                     addMessageGrid.Visibility = Visibility.Hidden;
                     messagesGrid.Visibility = Visibility.Visible;
+                    trendsGrid.Visibility = Visibility.Hidden;
+                    mentionsGrid.Visibility = Visibility.Hidden;
+                    incidentsGrid.Visibility = Visibility.Hidden;
+                    urlGrid.Visibility = Visibility.Hidden;
+                    break;
+                case 2:
+                    addMessageGrid.Visibility = Visibility.Hidden;
+                    messagesGrid.Visibility = Visibility.Hidden;
+                    trendsGrid.Visibility = Visibility.Visible;
+                    mentionsGrid.Visibility = Visibility.Hidden;
+                    incidentsGrid.Visibility = Visibility.Hidden;
+                    urlGrid.Visibility = Visibility.Hidden;
+                    break;
+                case 3:
+                    addMessageGrid.Visibility = Visibility.Hidden;
+                    messagesGrid.Visibility = Visibility.Hidden;
+                    trendsGrid.Visibility = Visibility.Hidden;
+                    mentionsGrid.Visibility = Visibility.Visible;
+                    incidentsGrid.Visibility = Visibility.Hidden;
+                    urlGrid.Visibility = Visibility.Hidden;
+                    break;
+                case 4:
+                    addMessageGrid.Visibility = Visibility.Hidden;
+                    messagesGrid.Visibility = Visibility.Hidden;
+                    trendsGrid.Visibility = Visibility.Hidden;
+                    mentionsGrid.Visibility = Visibility.Hidden;
+                    incidentsGrid.Visibility = Visibility.Visible;
+                    urlGrid.Visibility = Visibility.Hidden;
+                    break;
+                case 5:
+                    addMessageGrid.Visibility = Visibility.Hidden;
+                    messagesGrid.Visibility = Visibility.Hidden;
+                    trendsGrid.Visibility = Visibility.Hidden;
+                    mentionsGrid.Visibility = Visibility.Hidden;
+                    incidentsGrid.Visibility = Visibility.Hidden;
+                    urlGrid.Visibility = Visibility.Visible;
                     break;
                 default:
                     break;
             }
+        }
+
+        private void serializeBtn_Click(object sender, RoutedEventArgs e)
+        {
+            serializeAll();
+        }
+
+        private void mainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            serializeAll();
+        }
+
+        private void serializeAll()
+        {
+            messageFactory.serializeAll();
+            URLQuarantine.Instance.serialize();
+            Hashtag.Instance.serialize();
+            Mention.Instance.serialize();
+            IncidentManager.Instance.serialize();
         }
     }
 }
